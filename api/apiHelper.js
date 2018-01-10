@@ -1,6 +1,8 @@
 const goodreads = require('./goodreads.js')
 const axios = require('axios')
-const {goodreads_key} = require('../api/goodreads.js')
+const {goodreadsKey} = require('./goodreads.js')
+const {NYTKey} = require('./apiKeys.js')
+const $ = require('jquery')
 
 //**** API search body:
  // q: The query text to match against book title, author, and ISBN fields. Supports boolean operators and phrase searching.
@@ -14,7 +16,7 @@ var searchBook = (book, cb) => {
   axios.get('https://www.goodreads.com/search.xml', {
       params: {
         q: book,
-        key: goodreads_key.key,
+        key: goodreadsKey.key,
       }
     })
     .then(function (response) {
@@ -25,6 +27,19 @@ var searchBook = (book, cb) => {
     });
 }
 
+var getBestSellersBooks = (callback) => {
+    var url = "https://api.nytimes.com/svc/books/v3/lists/best-sellers/history.json";
+    url += '?' + $.param({'api-key': NYTKey});
+    $.ajax({
+      url: 'url',
+      method: 'GET',
+      }).done(function(result) {
+    }).fail(function(err) {
+      throw err;
+    });
+  }
+
 module.exports = {
-  searchBook
+  searchBook,
+  getBestSellersBooks
 }

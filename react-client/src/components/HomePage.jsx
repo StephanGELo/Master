@@ -18,16 +18,14 @@ class HomePage extends React.Component {
   }
 
   getBestSellersBooks() {
-    var url = "https://api.nytimes.com/svc/books/v3/lists/best-sellers/history.json";
-    url += '?' + $.param({'api-key': "ad2386dd7c8d4de2968ee43d3310d34a"});
 
     $.ajax({
-      url: url,
+      url: '/bestSellers',
       method: 'GET',
       }).done(function(result) {
-      console.log(result.results.title);
+      console.log("on line 26 in Hompeapage", result.results);
       this.setState({
-        bestSellerBooks: result
+        bestSellerBooks: result.results
       });
     }).fail(function(err) {
       throw err;
