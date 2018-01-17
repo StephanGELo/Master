@@ -12,6 +12,8 @@ import ExpandMoreIcon from 'material-ui-icons/ExpandMore';
 import MoreVertIcon from 'material-ui-icons/MoreVert';
 import Divider from 'material-ui/Divider';
 import renderHTML from 'react-render-html';
+import $ from 'jquery';
+const axios = require('axios');
 
 import PopUp from './PopUp.jsx';
 import Rating from './Rating.jsx';
@@ -58,6 +60,7 @@ class BookCard extends React.Component {
     this.submitRank = this.submitRank.bind(this);
     this.goToBook = this.goToBook.bind(this);
     this.handleExpandClick = this.handleExpandClick.bind(this);
+    //this.addtoFavorites = this.addtoFavorites.bind(this);
   }
 
   componentDidMount() {
@@ -83,6 +86,20 @@ class BookCard extends React.Component {
 
   submitRank(rating) {
     // stuff here
+
+  }
+
+  addtoFavorites() {
+    // add books object to the array of favoriteBooks in user schema and save to DB
+    alert('you clicked me');
+    axios({
+      method: 'post',
+      url: '/favorites',
+      data: {
+        username: 'Stephan',
+        isbn13: '1234567891011',
+      },
+    });
   }
 
   render() {
@@ -123,8 +140,10 @@ class BookCard extends React.Component {
 
           <Divider light />
           <CardActions disableActionSpacing>
-            <IconButton aria-label="Add to favorites">
-              <FavoriteIcon />
+            <IconButton aria-label="Add to favorites" >
+              <FavoriteIcon
+              onClick={this.addtoFavorites}
+              />
             </IconButton>
 
             <Rating

@@ -59,6 +59,7 @@ module.exports = {
     });
   },
   postLogin: (req, res) => {
+    console.log(" in handler on line 62", req);
     let loginData = {};
     req.on('data', (chunk) => {
       loginData = JSON.parse(chunk.toString());
@@ -133,4 +134,41 @@ module.exports = {
       res.json([err, data]);
     });
   },
+
+  postFavorites: (req, res) => {
+     db.saveFavorite(req.body, (err, data) => {
+      res.json([err, data]);
+    });
+  },
+
+
+
+   // //console.log(" in handler on line 138", req)
+   //  const { username, isbn } = req.body; // to check isbn format/data being returned.
+   //  //console.log("username on line 141 in handler", username);
+   //  db.findUserFavorites(username, (err, data) => { // to find out what data is being returned. Expecting an array of books
+   //    console.log("data on line 143 in Handler", data);
+   //     if (err) {
+   //      console.log("failed");
+   //      res.sendStatus(500);
+   //     } else {
+   //    //   //console.log("on line 145 in handler", data);
+   //    //   if(!data.length) {
+   //    //      // check whether isbn already exists, if yes
+   //    //      // find out isbn number
+   //    //      // add isbn number to favoriteBooks array
+   //    //      // save to database
+   //    //      //updateFavorites..
+   //    //      res.json({status:'added'})
+   //    //   }
+   //    //   //else {
+   //    //     //if isbn already exists in Favorites book
+   //    //     // delete isbn
+   //    //     //save to database
+   //    //    // res.json({status:'deleted'});
+   //    //   //}
+   //    }
+   //  });
+
+  // },
 };
