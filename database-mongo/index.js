@@ -56,7 +56,7 @@ const reviewSchema = new mongoose.Schema({
 const Book = mongoose.model('Book', bookSchema);
 const User = mongoose.model('User', userSchema);
 const Review = mongoose.model('Review', reviewSchema);
-const favorite = mongoose.model('Favorite', favoriteSchema);
+// const favorite = mongoose.model('Favorite', favoriteSchema);
 
 const selectAllBooks = (callback) => {
   Book.find({}, (err, items) => {
@@ -69,14 +69,14 @@ const selectAllBooks = (callback) => {
 };
 
 const findUserFavorites = (user, cb) => {
-  console.log("on line 71 in DB", user);
+  console.log("on line 72 @ DB.findUserFavorites", user);
   const books = [];
   User.find({ username: user }).then((foundUser) => {
     const len = foundUser[0].favoriteBooks.length;
     foundUser[0].favoriteBooks.forEach((book) => {
-      console.log(" on line 76", book);
+      console.log(" on line 76 @ db.findUserFavorites", book);
       Book.find({ isbn13: book }).then((foundBook) => {
-        console.log("on line 77", foundBook);
+        console.log("on line 77 @ db.findUserFavorites", foundBook);
         books.push(foundBook);
       }).then(() => {
         if (books.length === len) {
@@ -153,6 +153,7 @@ const findReview = (review, cb) => {
   });
 };
 
+// DO NOT TOUCH
 const saveReview = (review, cb) => {
   const reviewID = `${review.user}${review.isbn13}`;
   findReview(reviewID, (err, data) => {
@@ -161,7 +162,7 @@ const saveReview = (review, cb) => {
       console.log(err);
       cb(err, null);
     } else if (data) {
-      console.log('Success on databae review look up line 160');
+      console.log('Success on database review look up line 160');
       console.log(data);
 
       if (review.review.length > 0) {
@@ -197,64 +198,116 @@ const saveReview = (review, cb) => {
   });
 };
 
+// STEPHAN: YOU DONT NEED THIS. YOU CAN USE findUserFavorites
+
+// const findFavorite = (favorite, cb) => {
+//   favorite.findOne({ idNameNumber: review }, (err, item) => {
+//     if (err) {
+//       cb(err, null);
+//     } else {
+//       cb(null, item);
+//     }
+//   });
+// };
 
 
-const findFavorite = (favorite, cb) => {
-  favorite.findOne({ idNameNumber: review }, (err, item) => {
-    if (err) {
-      cb(err, null);
-    } else {
-      cb(null, item);
+
+// STEPHAN: THIS IS WHERE YOU ARE WORKING
+
+// check DB and see whether user exists
+// if user exists, check whether isbn13 exists in favorite books
+     // if isbn13 exists, delete isbn13 (assume the only time favorite book get added is via clicking of heart)
+     // if isbn13 does not exists, add isbn13 to favorite books
+// if user does not exists, create new user..(this is already being taken care of.. no need to worry about this in here)
+
+
+const saveFavorite = (userObject, cb) => {
+  const { user, isbn13 } = userObject;
+  console.log('on line 201  @ db.saveFavorite', user, isbn13);
+
+  const updatedFavoriteBooks = user.favoriteBooks;
+  console.log('before', updatedFavoriteBooks.length);
+
+  let removed = false;
+
+  if (updatedFavoriteBooks.length > 0) {
+    updatedFavoriteBooks.forEach((isbn, index) => {
+      // console.log('');
+      console.log('are they equal?:', isbn, isbn13, isbn - isbn13);
+      if (isbn - isbn13 === 0) {
+        console.log('then remove it');
+        removed = true;
+        updatedFavoriteBooks.splice(index, 1);
+        console.log('DURING', updatedFavoriteBooks.length);
+
+      }
+    });
+    if (!removed) {
+      console.log('   or we could add it');
+      updatedFavoriteBooks.push(isbn13);
     }
+  } else {
+    updatedFavoriteBooks.push(isbn13);
+  }
+
+  console.log('after', updatedFavoriteBooks.length);
+
+  User.update({ username: user }, {
+    favoriteBooks: updatedFavoriteBooks,
+  }, (errUpdate, dataUpdate) => {
+    cb(errUpdate, dataUpdate);
   });
 };
 
-const saveFavorite = (favorite, cb) => {
-  console.log(" on line 201  in db", favorite);
 
-  const favoriteID = `${favorite.username}${favorite.isbn13}`;
-  findReview(favoriteID, (err, data) => {
-    if (err) {
-      console.log('ERR on Database line 206');
-      console.log(err);
-      cb(err, null);
-    } else if (data) {
-      console.log('Success on database favorite look up line 210');
-      console.log(data);
 
-      if (favorite.favorite.length > 0) {
-        updatedFavorite = favorite.favorite;
-        console.log(updatedFavorite);
-      } else {
-       // updatedFavorite = data.text;
-      }
 
-      if (review.rating > 0) {
-        updatedRating = review.rating;
-      } else {
-        updatedRating = data.rating;
-      }
+// const saveFavorite = (favorite, cb) => {
+//   console.log(" on line 201  @ db.saveFavorite", favorite);
 
-      Review.update({ idNameNumber: reviewID }, {
-        text: updatedReview,
-        rating: updatedRating,
-      }, (errUpdate, dataUpdate) => {
-        cb(errUpdate, dataUpdate);
-      });
-    } else {
-      console.log('add NEW DB @ 184', review);
-      const newReview = new Review({
-        idNameNumber: reviewID,
-        user: review.user,
-        isbn: review.isbn13,
-        text: review.review,
-        rating: review.rating,
-      });
-      newReview.save();
-      cb(null, data);
-    }
-  });
-};
+//   const user = `${favorite.user.username}`;
+//   const isbn13 = `${favorite.isbn13}`;
+//   console.log('on line 226 @ db.saveFavorite', user, isbn13);
+
+//   findUserFavorites(user, (err, data) => {
+//     console.log(" on line 231 in db", user);
+//     if (err) {
+//       console.log('ERR on Database line 206');
+//       console.log(err);
+//       cb(err, null);
+//     } else if (data) {
+//       console.log(" on line 235 in db", data);
+//       console.log('Success on database favorite look up line 210');
+//       console.log(data);
+
+//       if (user.favoriteBooks) {
+//         updatedFavorite = user.favoriteBooks.is
+//         console.log(updatedFavorite);
+//       }
+//       //else {
+//       //  // updatedFavorite = data.text;
+//       //}
+
+//       User.update({ username: user }, {
+//         favoriteBooks: updatedFavorite,
+//       }, (errUpdate, dataUpdate) => {
+//         cb(errUpdate, dataUpdate);
+//       });
+//     }
+    //else {
+    //   console.log('add to favorite on line 261 @ DB.saveFavorite', isbn13);
+    //   const newUser = new User({
+    //      name: user,
+    //      username: user,
+    //      password: password,
+    //      reviewedBooks: reviewedBooks,
+    //      favoriteBooks: isbn13,
+    //   });
+    //   newUser.save();
+    //   cb(null, data);
+    // }
+  //});
+//}
 
 
 

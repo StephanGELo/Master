@@ -59,7 +59,7 @@ module.exports = {
     });
   },
   postLogin: (req, res) => {
-    console.log(" in handler on line 62", req);
+    //console.log(" in handler on line 62", req);
     let loginData = {};
     req.on('data', (chunk) => {
       loginData = JSON.parse(chunk.toString());
@@ -122,6 +122,7 @@ module.exports = {
   },
   getBestSellers: (req, res) => {
     api.getBestBooks((err, data) => {
+      //console.log('request');
       if (err) {
         res.sendStatus(500);
       } else {
@@ -136,7 +137,9 @@ module.exports = {
   },
 
   postFavorites: (req, res) => {
-     db.saveFavorite(req.body, (err, data) => {
+    console.log('this is the req.body we got from the front end');
+    // console.log(req.body);
+    db.saveFavorite(req.body, (err, data) => {
       res.json([err, data]);
     });
   },

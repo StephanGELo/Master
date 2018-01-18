@@ -112,6 +112,8 @@ class HomePage extends React.Component {
                   book={book}
                   key={book.isbn13}
                   changeView={this.props.changeView}
+                  userProfile={this.props.userProfile}
+                  updateUserData={this.props.updateUserData}
                 />
             ))}
             </Grid>

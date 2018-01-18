@@ -56,10 +56,16 @@ class BookCard extends React.Component {
       expanded: false,
       rating: 0,
       description: '',
+      user: this.props.userProfile,
+      liked: false,
+      thing: 0,
     };
     this.submitRank = this.submitRank.bind(this);
     this.goToBook = this.goToBook.bind(this);
     this.handleExpandClick = this.handleExpandClick.bind(this);
+    this.addtoFavorites= this.addtoFavorites.bind(this);
+    this.updateFavorite=this.updateFavorite.bind(this);
+    console.log(" on line 63 @ class bookcard", this.props.user);
     //this.addtoFavorites = this.addtoFavorites.bind(this);
   }
 
@@ -73,6 +79,8 @@ class BookCard extends React.Component {
     this.setState({
       description: arrayString,
     });
+    const favIsbns = this.props;
+    console.log("on line 79", favIsbns );
   }
 
   goToBook() {
@@ -89,21 +97,44 @@ class BookCard extends React.Component {
 
   }
 
-  addtoFavorites() {
+  updateFavorite() {
+    if (this.props.userProfile.favoriteBooks.length > 0 && !this.state.liked) {
+      this.props.userProfile.favoriteBooks.forEach((isbn13) => {
+        if (isbn13 - this.state.book.isbn13 === 0) {
+          this.setState({
+            liked: true,
+          }, () => { this.setState({ thing: Math.random() }); });
+        }
+      });
+    }
+  }
+
+  addtoFavorites(cb) {
+   // console.log(this.props.userProfile);
     // add books object to the array of favoriteBooks in user schema and save to DB
-    alert('you clicked me');
+    alert('you clicked me', this.props.userProfile);
     axios({
       method: 'post',
       url: '/favorites',
       data: {
-        username: 'Stephan',
-        isbn13: '1234567891011',
+        user: this.props.userProfile,
+        isbn13: this.state.book.isbn13,
       },
+    })
+    .then((response) => {
+      const newFavs = JSON.parse(response.config.data);
+      //console.log('response.body', newFavs);
+      let user = this.props.userProfile;
+      user.favoriteBooks = response;
+      // this.props.updateUserData(user)
     });
   }
 
+
+
   render() {
     const { classes } = this.props;
+    this.updateFavorite();
 
     return (
       <Grid item style={{ padding: 20 }} >
@@ -122,6 +153,10 @@ class BookCard extends React.Component {
             onClick={this.goToBook}
             style={{ cursor: 'pointer' }}
           />
+          name: {this.props.userProfile.username}
+
+           liked: {this.state.liked ? ' liked' : ' hate'}
+
           <Divider light />
           <CardContent>
             <Typography component="p">
@@ -142,6 +177,8 @@ class BookCard extends React.Component {
           <CardActions disableActionSpacing>
             <IconButton aria-label="Add to favorites" >
               <FavoriteIcon
+
+              color={this.state.liked ? "accent" : "action"}
               onClick={this.addtoFavorites}
               />
             </IconButton>

@@ -14,7 +14,9 @@ class App extends React.Component {
     this.state = {
       view: null,
       items: [],
-      userProfile: {},
+      userProfile: {
+        favoriteBooks: [],
+      },
       selectedBook: {},
     };
     this.changeView = this.changeView.bind(this);
@@ -23,6 +25,7 @@ class App extends React.Component {
     this.setUserProfile = this.setUserProfile.bind(this);
     this.handleProfileClick = this.handleProfileClick.bind(this);
     this.handleLogout = this.handleLogout.bind(this);
+    this.updateUserData = this.updateUserData.bind(this);
   }
   //
   //componentDidMount() {
@@ -56,6 +59,12 @@ class App extends React.Component {
     }
     this.setState({
       view: choice,
+    });
+  }
+
+  updateUserData(userProfile) {
+    this.setState({
+      userProfile,
     });
   }
 
@@ -124,6 +133,8 @@ class App extends React.Component {
           changeView={this.changeView}
           fetch={this.fetch}
           submitReview={this.submitReview}
+          userProfile={this.state.userProfile}
+          updateUserData={this.updateUserData}
         />
       );
     } else if (this.state.view === 'Profile') {
@@ -131,7 +142,8 @@ class App extends React.Component {
         <ProfilePage
           fetch={this.fetch}
           changeView={this.changeView}
-          user={this.state.userProfile}
+          userProfile={this.state.userProfile}
+          updateUserData={this.updateUserData}
         />
       );
     } else if (this.state.view === 'Search') {
@@ -141,6 +153,8 @@ class App extends React.Component {
           changeView={this.changeView}
           searchedBook={this.state.searchedBook}
           searchResults={this.state.searchResults}
+          userProfile={this.state.userProfile}
+          updateUserData={this.updateUserData}
         />
       );
     }
@@ -149,6 +163,8 @@ class App extends React.Component {
         changeView={this.changeView}
         fetch={this.fetch}
         view={this.state.view}
+        userProfile={this.state.userProfile}
+        updateUserData={this.updateUserData}
       />
     );
   }

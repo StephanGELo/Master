@@ -48,6 +48,7 @@ const getMoreBookData = (book, cb) => {
 };
 
 const getBestBooks = (cb) => {
+  //console.log('gettingBestBooks')
   let url = 'https://api.nytimes.com/svc/books/v3/lists/best-sellers/history.json';
   url += `?${param({ 'api-key': NYTKey })}`;
 
